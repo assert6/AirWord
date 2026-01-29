@@ -79,7 +79,15 @@ export class WebSocketServer {
     // 绑定客户端到session（如果还没绑定）
     if (clientType === 'app') {
       if (!session.appClient || session.appClient !== ws) {
-        sessionManager.bindAppClient(sessionId, ws);
+        const bound = sessionManager.bindAppClient(sessionId, ws);
+        if (!bound) {
+          ws.send(JSON.stringify({
+            type: 'error',
+            message: '此会话已有其他App连接，请使用新的会话',
+            timestamp: Date.now()
+          }));
+          return;
+        }
       }
     } else if (clientType === 'web' || clientType === 'desktop') {
       if (!session.webClient || session.webClient !== ws) {

@@ -49,10 +49,20 @@ class _InputScreenState extends State<InputScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // 断开连接并返回
+            _wsService.disconnect();
+            Navigator.pop(context);
+          },
+          tooltip: '返回',
+        ),
         title: const Text('AirWord 输入'),
         actions: [
+          // 连接状态
           Container(
-            margin: const EdgeInsets.only(right: 16),
+            margin: const EdgeInsets.only(right: 8),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: _isConnected ? Colors.green : Colors.orange,
@@ -63,9 +73,22 @@ class _InputScreenState extends State<InputScreen> {
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
+                fontSize: 12,
               ),
             ),
           ),
+          // 断开连接按钮
+          if (_isConnected)
+            IconButton(
+              icon: const Icon(Icons.link_off),
+              onPressed: () {
+                // 断开连接并返回首页
+                _wsService.disconnect();
+                Navigator.pop(context);
+              },
+              tooltip: '断开连接',
+            ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Padding(

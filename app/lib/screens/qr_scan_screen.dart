@@ -24,15 +24,21 @@ class _QRScanScreenState extends State<QRScanScreen> {
 
           for (final barcode in barcodes) {
             if (barcode.rawValue != null) {
+              print('=== 扫描到二维码 ===');
+              print('原始内容: ${barcode.rawValue}');
               try {
                 final data = json.decode(barcode.rawValue!) as Map<String, dynamic>;
+                print('解析后: $data');
                 if (data['type'] == 'airword-session' && data['sessionId'] != null) {
+                  print('✅ Session ID: ${data['sessionId']}');
                   widget.onScanned(data['sessionId'] as String);
                   Navigator.pop(context);
                   break;
+                } else {
+                  print('❌ 类型不匹配或sessionId为空');
                 }
               } catch (e) {
-                print('Failed to parse QR code: $e');
+                print('❌ 解析失败: $e');
               }
             }
           }

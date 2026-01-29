@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.airword_app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // ndkVersion = flutter.ndkVersion  // 注释掉，使用系统默认NDK
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

@@ -12,7 +12,11 @@
       "Bash(flutter create:*)",
       "Bash(pgrep:*)",
       "Bash(curl:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(npm install)",
+      "Bash(npm_config_cache=./npm_cache npm install:*)",
+      "Bash(npm run build)",
+      "Bash(npm install:*)"
     ]
   }
 }

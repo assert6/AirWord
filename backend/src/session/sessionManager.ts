@@ -51,6 +51,12 @@ class SessionManager {
       return false;
     }
 
+    // 检查是否已有App连接
+    if (session.appClient && session.appClient.readyState === WebSocket.OPEN) {
+      console.log(`App client already connected to session: ${sessionId}, rejecting new connection`);
+      return false;
+    }
+
     session.appClient = ws;
     session.lastActivity = new Date();
     console.log(`App client bound to session: ${sessionId}`);

@@ -10,6 +10,7 @@ export interface WebSocketMessage {
 export interface ElectronAPI {
   typeText: (text: string) => Promise<{ success: boolean; error?: string }>;
   deleteText: (count: number) => Promise<{ success: boolean; error?: string }>;
+  copyText?: (text: string) => void;
 }
 
 declare global {

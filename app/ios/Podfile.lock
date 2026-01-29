@@ -58,16 +58,12 @@ PODS:
   - mobile_scanner (3.5.6):
     - Flutter
     - GoogleMLKit/BarcodeScanning (~> 4.0.0)
-  - MTBBarcodeScanner (5.0.11)
   - nanopb (2.30910.0):
     - nanopb/decode (= 2.30910.0)
     - nanopb/encode (= 2.30910.0)
   - nanopb/decode (2.30910.0)
   - nanopb/encode (2.30910.0)
   - PromisesObjC (2.4.0)
-  - qr_code_scanner (0.2.0):
-    - Flutter
-    - MTBBarcodeScanner
   - ReachabilitySwift (5.2.4)
   - shared_preferences_foundation (0.0.1):
     - Flutter
@@ -77,7 +73,6 @@ DEPENDENCIES:
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - Flutter (from `Flutter`)
   - mobile_scanner (from `.symlinks/plugins/mobile_scanner/ios`)
-  - qr_code_scanner (from `.symlinks/plugins/qr_code_scanner/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
 
 SPEC REPOS:
@@ -92,7 +87,6 @@ SPEC REPOS:
     - MLKitBarcodeScanning
     - MLKitCommon
     - MLKitVision
-    - MTBBarcodeScanner
     - nanopb
     - PromisesObjC
     - ReachabilitySwift
@@ -104,8 +98,6 @@ EXTERNAL SOURCES:
     :path: Flutter
   mobile_scanner:
     :path: ".symlinks/plugins/mobile_scanner/ios"
-  qr_code_scanner:
-    :path: ".symlinks/plugins/qr_code_scanner/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
@@ -123,10 +115,8 @@ SPEC CHECKSUMS:
   MLKitCommon: c1b791c3e667091918d91bda4bba69a91011e390
   MLKitVision: 8baa5f46ee3352614169b85250574fde38c36f49
   mobile_scanner: 38dcd8a49d7d485f632b7de65e4900010187aef2
-  MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  qr_code_scanner: bb67d64904c3b9658ada8c402e8b4d406d5d796e
   ReachabilitySwift: 32793e867593cfc1177f5d16491e3a197d2fccda
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
 

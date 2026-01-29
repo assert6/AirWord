@@ -9,6 +9,13 @@ export default defineConfig({
     electron([
       {
         entry: 'src/main/index.ts',
+        vite: {
+          build: {
+            rollupOptions: {
+              external: ['robotjs']
+            }
+          }
+        }
       },
     ]),
     renderer(),

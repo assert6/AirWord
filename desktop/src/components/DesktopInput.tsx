@@ -1,40 +1,37 @@
-import React, { useState } from 'react';
-import { WebSocketMessage } from '../types';
+import { useState } from 'react';
 
 interface DesktopInputProps {
   content: string;
   isConnected: boolean;
+  inputMode: 'display' | 'direct';
+  setInputMode: (mode: 'display' | 'direct') => void;
 }
 
-export const DesktopInput: React.FC<DesktopInputProps> = ({ content, isConnected }) => {
-  const [inputMode, setInputMode] = useState<'display' | 'direct'>('display');
-  const [lastTypedContent, setLastTypedContent] = useState('');
+export const DesktopInput: React.FC<DesktopInputProps> = ({ content, isConnected, inputMode, setInputMode }) => {
+  const [showCopyToast, setShowCopyToast] = useState(false);
 
-  const handleDirectInput = async (text: string) => {
-    try {
-      if (window.electronAPI) {
-        await window.electronAPI.typeText(text);
-        setLastTypedContent(text);
-      }
-    } catch (error) {
-      console.error('Failed to type text:', error);
-    }
-  };
-
-  const handleDirectDelete = async (currentLength: number) => {
-    try {
-      if (window.electronAPI && currentLength < lastTypedContent.length) {
-        const deleteCount = lastTypedContent.length - currentLength;
-        await window.electronAPI.deleteText(deleteCount);
-        setLastTypedContent(lastTypedContent.slice(0, currentLength));
-      }
-    } catch (error) {
-      console.error('Failed to delete text:', error);
+  const handleCopy = () => {
+    if (content) {
+      navigator.clipboard.writeText(content);
+      setShowCopyToast(true);
+      setTimeout(() => setShowCopyToast(false), 2000);
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-4">
+      {/* 复制成功提示气泡 */}
+      {showCopyToast && (
+        <div className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 animate-bounce">
+          <div className="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
+            <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="font-medium">复制成功！</span>
+          </div>
+        </div>
+      )}
+
       <div className="w-full max-w-3xl">
         {/* 状态指示器 */}
         <div className="mb-6 text-center">
@@ -84,48 +81,37 @@ export const DesktopInput: React.FC<DesktopInputProps> = ({ content, isConnected
               AirWord PC - 显示模式
             </h1>
 
-            {content ? (
-              <div>
-                <div className="bg-gray-50 rounded-lg p-6 min-h-[200px] border-2 border-gray-200">
+            <div>
+              <div className={`rounded-lg p-6 min-h-[200px] ${content ? 'bg-gray-50 border-2 border-gray-200' : 'bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center'}`}>
+                {content ? (
                   <p className="text-xl text-gray-800 whitespace-pre-wrap break-words leading-relaxed">
                     {content}
                   </p>
-                </div>
-                <div className="mt-4 flex gap-3">
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(content);
-                    }}
-                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200"
-                  >
-                    复制内容
-                  </button>
-                  <button
-                    onClick={async () => {
-                      if (window.electronAPI) {
-                        await window.electronAPI.typeText(content);
-                      }
-                    }}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200"
-                  >
-                    模拟键盘输入
-                  </button>
-                </div>
+                ) : (
+                  <p className="text-gray-400 text-center">
+                    {isConnected
+                      ? '在App中输入，内容将实时显示在这里...'
+                      : '请先连接App'}
+                  </p>
+                )}
               </div>
-            ) : (
-              <div className="bg-gray-50 rounded-lg p-6 min-h-[200px] border-2 border-dashed border-gray-300 flex items-center justify-center">
-                <p className="text-gray-400 text-center">
-                  {isConnected
-                    ? '在App中输入，内容将实时显示在这里...'
-                    : '请先连接App'}
-                </p>
-              </div>
-            )}
+              <button
+                onClick={handleCopy}
+                disabled={!content}
+                className={`mt-4 w-full font-medium py-3 px-6 rounded-lg transition-colors duration-200 ${
+                  content
+                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                复制内容
+              </button>
+            </div>
 
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-800">
                 <strong>提示:</strong> 显示模式只显示内容，不会自动输入到光标位置。
-                点击"模拟键盘输入"可将内容输入到当前光标位置。
+                点击"复制内容"可复制到剪贴板。
               </p>
             </div>
           </div>
@@ -152,12 +138,6 @@ export const DesktopInput: React.FC<DesktopInputProps> = ({ content, isConnected
                     {content}
                   </p>
                 </div>
-
-                <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <p className="text-sm text-green-800">
-                    ✓ 已自动输入 {content.length} 个字符到光标位置
-                  </p>
-                </div>
               </div>
             ) : (
               <div className="bg-gray-50 rounded-lg p-6 min-h-[200px] border-2 border-dashed border-gray-300 flex items-center justify-center">
@@ -182,7 +162,7 @@ export const DesktopInput: React.FC<DesktopInputProps> = ({ content, isConnected
         <div className="mt-6 text-center text-sm text-gray-600">
           <p>连接后，App端的输入会实时同步到PC端</p>
           <p className="mt-1">
-            快捷键: <kbd className="px-2 py-1 bg-gray-200 rounded">Ctrl+Shift+A</kbd> 显示/隐藏窗口
+            快捷键: <kbd className="px-2 py-1 bg-gray-200 rounded">Ctrl+Shift+W</kbd> 显示/隐藏窗口
           </p>
         </div>
       </div>

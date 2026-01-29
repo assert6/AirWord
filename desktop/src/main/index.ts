@@ -33,7 +33,7 @@ app.whenReady().then(() => {
   createWindow();
 
   // 注册全局快捷键 (可选: Ctrl+Shift+A 显示/隐藏窗口)
-  globalShortcut.register('CommandOrControl+Shift+A', () => {
+  globalShortcut.register('CommandOrControl+Shift+W', () => {
     if (mainWindow) {
       if (mainWindow.isVisible()) {
         mainWindow.hide();
@@ -62,24 +62,28 @@ app.on('will-quit', () => {
 });
 
 // IPC处理程序
-ipcMain.handle('type-text', async (event, text: string) => {
+ipcMain.handle('type-text', async (_event, text: string) => {
+  console.log('Main: type-text called with:', text);
   try {
     robot.typeString(text);
+    console.log('Main: type-text success');
     return { success: true };
   } catch (error) {
-    console.error('Failed to type text:', error);
+    console.error('Main: Failed to type text:', error);
     return { success: false, error: String(error) };
   }
 });
 
-ipcMain.handle('delete-text', async (event, count: number) => {
+ipcMain.handle('delete-text', async (_event, count: number) => {
+  console.log('Main: delete-text called with count:', count);
   try {
     for (let i = 0; i < count; i++) {
       robot.keyTap('backspace');
     }
+    console.log('Main: delete-text success');
     return { success: true };
   } catch (error) {
-    console.error('Failed to delete text:', error);
+    console.error('Main: Failed to delete text:', error);
     return { success: false, error: String(error) };
   }
 });
