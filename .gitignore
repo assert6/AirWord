@@ -1,0 +1,26 @@
+node_modules/
+dist/
+build/
+release/
+*.log
+.DS_Store
+.env
+.env.local
+*.iml
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Flutter
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Electron
+out/
+app/

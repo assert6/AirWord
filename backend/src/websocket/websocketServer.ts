@@ -1,0 +1,113 @@
+import WebSocket from 'ws';
+import { sessionManager } from '../session/sessionManager';
+
+export interface WebSocketMessage {
+  type: 'input' | 'delete' | 'connect' | 'disconnect' | 'heartbeat';
+  sessionId?: string;
+  clientType?: 'web' | 'app' | 'desktop';
+  content?: string;
+  timestamp: number;
+}
+
+export class WebSocketServer {
+  private wss: WebSocket.Server;
+  private heartbeatInterval: NodeJS.Timeout;
+
+  constructor(server: any) {
+    this.wss = new WebSocket.Server({ server });
+    this.setupWebSocket();
+    this.heartbeatInterval = setInterval(() => this.heartbeat(), 30000);
+    setInterval(() => sessionManager.cleanupExpiredSessions(), 60000);
+  }
+
+  private setupWebSocket(): void {
+    this.wss.on('connection', (ws: WebSocket) => {
+      console.log('New WebSocket connection');
+
+      ws.on('message', (data: string) => {
+        try {
+          const message: WebSocketMessage = JSON.parse(data);
+          this.handleMessage(ws, message);
+        } catch (error) {
+          console.error('Failed to parse message:', error);
+        }
+      });
+
+      ws.on('close', () => {
+        console.log('WebSocket connection closed');
+        sessionManager.removeClient(ws);
+      });
+
+      ws.on('error', (error) => {
+        console.error('WebSocket error:', error);
+      });
+
+      // 发送欢迎消息
+      ws.send(JSON.stringify({
+        type: 'connect',
+        timestamp: Date.now()
+      } as WebSocketMessage));
+    });
+  }
+
+  private handleMessage(ws: WebSocket, message: WebSocketMessage): void {
+    const { type, sessionId, clientType } = message;
+
+    if (type === 'heartbeat') {
+      if (sessionId) {
+        sessionManager.updateActivity(sessionId);
+      }
+      ws.send(JSON.stringify({ type: 'heartbeat', timestamp: Date.now() }));
+      return;
+    }
+
+    if (!sessionId || !clientType) {
+      console.warn('Message missing sessionId or clientType');
+      return;
+    }
+
+    const session = sessionManager.getSession(sessionId);
+    if (!session) {
+      ws.send(JSON.stringify({
+        type: 'error',
+        message: 'Session not found',
+        timestamp: Date.now()
+      }));
+      return;
+    }
+
+    // 更新会话活动时间
+    sessionManager.updateActivity(sessionId);
+
+    // 转发消息到对应的客户端
+    if (clientType === 'app') {
+      // App发送消息，转发到Web/PC
+      const targetClient = session.webClient;
+      if (targetClient && targetClient.readyState === WebSocket.OPEN) {
+        targetClient.send(JSON.stringify(message));
+      }
+    } else if (clientType === 'web' || clientType === 'desktop') {
+      // Web/PC发送消息，转发到App（如果需要双向通信）
+      const targetClient = session.appClient;
+      if (targetClient && targetClient.readyState === WebSocket.OPEN) {
+        targetClient.send(JSON.stringify(message));
+      }
+    }
+  }
+
+  private heartbeat(): void {
+    this.wss.clients.forEach((ws: WebSocket) => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: 'heartbeat',
+          timestamp: Date.now()
+        } as WebSocketMessage));
+      }
+    });
+  }
+
+  close(): void {
+    clearInterval(this.heartbeatInterval);
+    this.wss.close();
+  }
+}
