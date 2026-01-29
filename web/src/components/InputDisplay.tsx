@@ -36,31 +36,36 @@ export const InputDisplay: React.FC<InputDisplayProps> = ({
             AirWord 输入显示
           </h1>
 
-          {content ? (
-            <div className="relative">
-              <div className="bg-gray-50 rounded-lg p-6 min-h-[200px] border-2 border-gray-200">
+          <div className="relative">
+            <div className={`rounded-lg p-6 min-h-[200px] ${content ? 'bg-gray-50 border-2 border-gray-200' : 'bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center'}`}>
+              {content ? (
                 <p className="text-xl text-gray-800 whitespace-pre-wrap break-words leading-relaxed">
                   {content}
                 </p>
-              </div>
-              <button
-                onClick={() => {
+              ) : (
+                <p className="text-gray-400 text-center">
+                  {isConnected
+                    ? '在App中输入，内容将实时显示在这里...'
+                    : '请先使用App扫描二维码建立连接'}
+                </p>
+              )}
+            </div>
+            <button
+              onClick={() => {
+                if (content) {
                   navigator.clipboard.writeText(content);
-                }}
-                className="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200"
-              >
-                复制内容
-              </button>
-            </div>
-          ) : (
-            <div className="bg-gray-50 rounded-lg p-6 min-h-[200px] border-2 border-dashed border-gray-300 flex items-center justify-center">
-              <p className="text-gray-400 text-center">
-                {isConnected
-                  ? '在App中输入，内容将实时显示在这里...'
-                  : '请先使用App扫描二维码建立连接'}
-              </p>
-            </div>
-          )}
+                }
+              }}
+              disabled={!content}
+              className={`mt-4 w-full font-medium py-3 px-6 rounded-lg transition-colors duration-200 ${
+                content
+                  ? 'bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              复制内容
+            </button>
+          </div>
         </div>
 
         {/* 使用说明 */}

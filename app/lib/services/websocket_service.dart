@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../models/websocket_message.dart';
+import '../config/app_config.dart';
 
 class WebSocketService {
   WebSocketChannel? _channel;
-  final String _wsUrl = 'ws://localhost:3001';
   String? _sessionId;
   StreamController<WebSocketMessage>? _messageController;
   Timer? _heartbeatTimer;
@@ -21,7 +21,7 @@ class WebSocketService {
       _sessionId = sessionId;
       _messageController = StreamController<WebSocketMessage>.broadcast();
 
-      _channel = WebSocketChannel.connect(Uri.parse(_wsUrl));
+      _channel = WebSocketChannel.connect(Uri.parse(AppConfig.wsUrl));
 
       // 监听消息
       _channel!.stream.listen(

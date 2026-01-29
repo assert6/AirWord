@@ -25,8 +25,20 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode, sessionId 
 
         {/* Session ID 显示 */}
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <p className="text-xs text-gray-500 mb-1">会话ID</p>
+          <div className="flex justify-between items-center mb-1">
+            <p className="text-xs text-gray-500">会话ID (调试用)</p>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(sessionId);
+                alert('Session ID 已复制！');
+              }}
+              className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+            >
+              复制
+            </button>
+          </div>
           <p className="text-sm font-mono text-gray-800 break-all">{sessionId}</p>
+          <p className="text-xs text-gray-400 mt-2">💡或使用"手动输入Session ID"功能</p>
         </div>
 
         {/* 使用说明 */}

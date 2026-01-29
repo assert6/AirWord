@@ -34,26 +34,31 @@ function App() {
     switch (message.type) {
       case 'input':
         if (message.content !== undefined) {
+          console.log('Setting input content:', message.content);
           setInputContent(message.content);
         }
         break;
       case 'delete':
         if (message.content !== undefined) {
+          console.log('Deleting content, new:', message.content);
           setInputContent(message.content);
         }
         break;
       case 'connect':
         if (message.clientType === 'app') {
+          console.log('App connected!');
           setIsConnected(true);
           setShowQRCode(false);
         }
         break;
       case 'disconnect':
         if (message.clientType === 'app') {
+          console.log('App disconnected');
           setIsConnected(false);
         }
         break;
       default:
+        console.log('Unknown message type:', message.type);
         break;
     }
   }, []);
@@ -68,14 +73,15 @@ function App() {
   }, []);
 
   // WebSocket连接
-  useWebSocket(sessionId, handleMessage, handleConnect, handleDisconnect);
+  const { connect } = useWebSocket(sessionId, handleMessage, handleConnect, handleDisconnect);
 
   // 当有sessionId时自动连接WebSocket
   useEffect(() => {
     if (sessionId) {
-      // WebSocket hook会自动连接
+      console.log('Connecting to WebSocket with sessionId:', sessionId);
+      connect();
     }
-  }, [sessionId]);
+  }, [sessionId, connect]);
 
   if (showQRCode && qrCode) {
     return <QRCodeDisplay qrCode={qrCode} sessionId={sessionId} />;

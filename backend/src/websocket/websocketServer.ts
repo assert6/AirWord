@@ -76,6 +76,17 @@ export class WebSocketServer {
       return;
     }
 
+    // 绑定客户端到session（如果还没绑定）
+    if (clientType === 'app') {
+      if (!session.appClient || session.appClient !== ws) {
+        sessionManager.bindAppClient(sessionId, ws);
+      }
+    } else if (clientType === 'web' || clientType === 'desktop') {
+      if (!session.webClient || session.webClient !== ws) {
+        sessionManager.bindWebClient(sessionId, ws);
+      }
+    }
+
     // 更新会话活动时间
     sessionManager.updateActivity(sessionId);
 
@@ -83,14 +94,22 @@ export class WebSocketServer {
     if (clientType === 'app') {
       // App发送消息，转发到Web/PC
       const targetClient = session.webClient;
+      console.log(`App message to Web: session=${sessionId}, type=${message.type}, content="${message.content}"`);
       if (targetClient && targetClient.readyState === WebSocket.OPEN) {
+        console.log('Forwarding to Web client');
         targetClient.send(JSON.stringify(message));
+      } else {
+        console.log('Web client not connected or not ready');
       }
     } else if (clientType === 'web' || clientType === 'desktop') {
       // Web/PC发送消息，转发到App（如果需要双向通信）
       const targetClient = session.appClient;
+      console.log(`Web message to App: session=${sessionId}, type=${message.type}`);
       if (targetClient && targetClient.readyState === WebSocket.OPEN) {
+        console.log('Forwarding to App client');
         targetClient.send(JSON.stringify(message));
+      } else {
+        console.log('App client not connected or not ready');
       }
     }
   }

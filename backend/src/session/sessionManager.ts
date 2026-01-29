@@ -33,19 +33,27 @@ class SessionManager {
 
   bindWebClient(sessionId: string, ws: WebSocket): boolean {
     const session = this.sessions.get(sessionId);
-    if (!session) return false;
+    if (!session) {
+      console.log(`Failed to bind Web client: session ${sessionId} not found`);
+      return false;
+    }
 
     session.webClient = ws;
     session.lastActivity = new Date();
+    console.log(`Web client bound to session: ${sessionId}`);
     return true;
   }
 
   bindAppClient(sessionId: string, ws: WebSocket): boolean {
     const session = this.sessions.get(sessionId);
-    if (!session) return false;
+    if (!session) {
+      console.log(`Failed to bind App client: session ${sessionId} not found`);
+      return false;
+    }
 
     session.appClient = ws;
     session.lastActivity = new Date();
+    console.log(`App client bound to session: ${sessionId}`);
     return true;
   }
 

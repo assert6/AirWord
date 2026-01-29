@@ -9,10 +9,11 @@ const server = http.createServer(app);
 // 初始化WebSocket服务器
 const wsServer = new WebSocketServer(server);
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`AirWord backend server running on port ${PORT}`);
   console.log(`WebSocket server ready`);
-  console.log(`API: http://localhost:${PORT}`);
+  console.log(`Local API: http://localhost:${PORT}`);
+  console.log(`Network API: http://192.168.2.29:${PORT}`);
 });
 
 // 优雅关闭
