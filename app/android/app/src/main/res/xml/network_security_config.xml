@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 允许特定域名的HTTP连接（AirWord项目专用） -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">192.168.2.29</domain>
+        <domain includeSubdomains="true">airword-dev.assert6.com</domain>
+        <domain includeSubdomains="true">airword.assert6.com</domain>
+    </domain-config>
+
+    <!-- 其他域名默认要求HTTPS -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(flutter doctor:*)",
+      "Bash(xcrun simctl:*)",
+      "Bash(open -a Simulator)",
+      "Bash(flutter devices:*)",
+      "Bash(flutter build:*)",
+      "Bash(chmod:*)",
+      "Bash(flutter run:*)",
+      "Bash(flutter create:*)",
+      "Bash(pgrep:*)",
+      "Bash(curl:*)",
+      "Bash(echo:*)"
+    ]
+  }
+}
