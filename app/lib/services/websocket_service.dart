@@ -12,8 +12,7 @@ class WebSocketService {
   bool _isConnected = false;
   StreamSubscription? _streamSubscription;
 
-  Stream<WebSocketMessage>? get messageStream =>
-      _messageController?.stream;
+  Stream<WebSocketMessage>? get messageStream => _messageController?.stream;
 
   bool get isConnected => _isConnected;
 
@@ -71,7 +70,7 @@ class WebSocketService {
   Future<void> reconnect() async {
     print('Reconnecting to WebSocket...');
     await _streamSubscription?.cancel();
-    await _heartbeatTimer?.cancel();
+    _heartbeatTimer?.cancel();
 
     if (_sessionId != null) {
       await _connect(_sessionId!);

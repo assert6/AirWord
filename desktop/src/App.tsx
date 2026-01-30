@@ -52,7 +52,7 @@ function App() {
 
   // WebSocket消息处理
   const handleMessage = useCallback((message: WebSocketMessage) => {
-    console.log('Desktop received message:', message, 'Current mode:', inputMode);
+    // console.log('Desktop received message:', message, 'Current mode:', inputMode);
 
     switch (message.type) {
       case 'input':
@@ -71,7 +71,7 @@ function App() {
 
               if (window.electronAPI) {
                 window.electronAPI.typeText(newChars).then(result => {
-                  console.log('Type result:', result);
+                  // console.log('Type result:', result);
                 }).catch(err => {
                   console.error('Type error:', err);
                 });
@@ -81,11 +81,11 @@ function App() {
             } else if (newContent.length < lastContent.length) {
               // 删除字符
               const deleteCount = lastContent.length - newContent.length;
-              console.log('Deleting chars:', deleteCount);
+              // console.log('Deleting chars:', deleteCount);
 
               if (window.electronAPI) {
                 window.electronAPI.deleteText(deleteCount).then(result => {
-                  console.log('Delete result:', result);
+                  // console.log('Delete result:', result);
                 }).catch(err => {
                   console.error('Delete error:', err);
                 });
