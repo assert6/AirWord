@@ -21,15 +21,34 @@ function _interopNamespaceDefault(e) {
 const robot__namespace = /* @__PURE__ */ _interopNamespaceDefault(robot);
 let mainWindow = null;
 function createWindow() {
+  const { screen } = require("electron");
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  const isDev = process.env.VITE_DEV_SERVER_URL;
   mainWindow = new electron.BrowserWindow({
-    width: 800,
-    height: 600,
+    width: Math.min(1e3, width * 0.7),
+    height: Math.min(900, height * 0.8),
+    minWidth: 800,
+    minHeight: 700,
     webPreferences: {
-      preload: path.join(__dirname, "../preload/index.js"),
-      contextIsolation: true,
-      nodeIntegration: false
+      // 开发环境：使用nodeIntegration，生产环境：使用preload
+      preload: isDev ? void 0 : path.join(__dirname, "../preload/index.js"),
+      contextIsolation: false,
+      nodeIntegration: true,
+      nodeIntegrationInWorker: true,
+      webSecurity: false
     },
     autoHideMenuBar: true
+  });
+  if (process.env.VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+    mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.loadFile(path.join(__dirname, "../renderer/index.html"));
+  }
+  console.log("Preload path:", path.join(__dirname, "../preload/index.js"));
+  console.log("__dirname:", __dirname);
+  mainWindow.webContents.on("preload-error", (event) => {
+    console.error("Preload error:", event);
   });
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);

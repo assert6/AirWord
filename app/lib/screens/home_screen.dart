@@ -106,7 +106,7 @@ class HomeScreen extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (context) => QRScanScreen(
                           onScanned: (sessionId) {
-                            Navigator.pushReplacement(
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
@@ -228,7 +228,7 @@ class HomeScreen extends StatelessWidget {
               final sessionId = sessionController.text.trim();
               if (sessionId.isNotEmpty) {
                 Navigator.pop(context);
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => InputScreen(sessionId: sessionId),

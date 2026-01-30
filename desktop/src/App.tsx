@@ -5,6 +5,21 @@ import { useWebSocket } from './services/websocket';
 import { api } from './services/api';
 import { WebSocketMessage } from './types';
 
+// 创建electronAPI（开发环境）
+const createElectronAPI = () => {
+  if (window.require) {
+    const { ipcRenderer, clipboard } = window.require('electron');
+    return {
+      typeText: (text: string) => ipcRenderer.invoke('type-text', text),
+      deleteText: (count: number) => ipcRenderer.invoke('delete-text', count),
+      copyText: (text: string) => {
+        clipboard.writeText(text);
+      },
+    };
+  }
+  return (window as any).electronAPI;
+};
+
 function App() {
   const [sessionId, setSessionId] = useState<string>('');
   const [qrCode, setQrCode] = useState<string>('');
@@ -13,6 +28,12 @@ function App() {
   const [showQRCode, setShowQRCode] = useState<boolean>(true);
   const [inputMode, setInputMode] = useState<'display' | 'direct'>('display');
   const lastContentRef = useRef<string>('');
+
+  // 初始化electronAPI
+  useEffect(() => {
+    (window as any).electronAPI = createElectronAPI();
+    console.log('ElectronAPI initialized:', !!(window as any).electronAPI);
+  }, []);
 
   // 初始化会话
   useEffect(() => {

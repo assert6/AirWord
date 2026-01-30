@@ -12,6 +12,12 @@ export function useWebSocket(
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
   const heartbeatIntervalRef = useRef<NodeJS.Timeout>();
+  const onMessageRef = useRef(onMessage);
+
+  // 更新onMessage引用
+  useEffect(() => {
+    onMessageRef.current = onMessage;
+  }, [onMessage]);
 
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -48,7 +54,7 @@ export function useWebSocket(
     ws.onmessage = (event) => {
       try {
         const message: WebSocketMessage = JSON.parse(event.data);
-        onMessage(message);
+        onMessageRef.current(message);
       } catch (error) {
         console.error('Failed to parse WebSocket message:', error);
       }
@@ -74,7 +80,7 @@ export function useWebSocket(
     };
 
     wsRef.current = ws;
-  }, [sessionId, onMessage, onConnect, onDisconnect]);
+  }, [sessionId, onConnect, onDisconnect]);
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {

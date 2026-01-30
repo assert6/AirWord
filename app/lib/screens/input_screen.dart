@@ -11,7 +11,7 @@ class InputScreen extends StatefulWidget {
   State<InputScreen> createState() => _InputScreenState();
 }
 
-class _InputScreenState extends State<InputScreen> {
+class _InputScreenState extends State<InputScreen> with WidgetsBindingObserver {
   late WebSocketService _wsService;
   final TextEditingController _textController = TextEditingController();
   bool _isConnected = false;
@@ -19,6 +19,8 @@ class _InputScreenState extends State<InputScreen> {
   @override
   void initState() {
     super.initState();
+    // 添加生命周期观察者
+    WidgetsBinding.instance.addObserver(this);
     _wsService = WebSocketService();
 
     // 连接WebSocket
@@ -30,12 +32,40 @@ class _InputScreenState extends State<InputScreen> {
         setState(() {
           _isConnected = true;
         });
+      } else if (message.type == 'disconnect') {
+        setState(() {
+          _isConnected = false;
+        });
       }
     });
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        // 从后台恢复，重新连接
+        print('App resumed, reconnecting WebSocket...');
+        setState(() {
+          _isConnected = false;
+        });
+        _wsService.reconnect();
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+        // 进入后台，不断开连接但标记为未连接状态
+        // WebSocket 会在后台被系统断开，回来时通过 didChangeAppLifecycleState.resumed 重新连接
+        break;
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _wsService.dispose();
     _textController.dispose();
     super.dispose();

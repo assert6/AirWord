@@ -10,6 +10,7 @@ class WebSocketService {
   StreamController<WebSocketMessage>? _messageController;
   Timer? _heartbeatTimer;
   bool _isConnected = false;
+  StreamSubscription? _streamSubscription;
 
   Stream<WebSocketMessage>? get messageStream =>
       _messageController?.stream;
@@ -17,14 +18,25 @@ class WebSocketService {
   bool get isConnected => _isConnected;
 
   Future<void> connect(String sessionId) async {
+    await _connect(sessionId);
+  }
+
+  Future<void> _connect(String sessionId) async {
     try {
+      print('Connecting to WebSocket: ${AppConfig.wsUrl}');
+
       _sessionId = sessionId;
-      _messageController = StreamController<WebSocketMessage>.broadcast();
+
+      // 如果已存在消息控制器，不重新创建以保持订阅
+      _messageController ??= StreamController<WebSocketMessage>.broadcast();
 
       _channel = WebSocketChannel.connect(Uri.parse(AppConfig.wsUrl));
 
+      // 取消之前的订阅
+      await _streamSubscription?.cancel();
+
       // 监听消息
-      _channel!.stream.listen(
+      _streamSubscription = _channel!.stream.listen(
         (data) {
           final message = WebSocketMessage.fromJson(
             json.decode(data) as Map<String, dynamic>,
@@ -49,9 +61,20 @@ class WebSocketService {
       _startHeartbeat();
 
       _isConnected = true;
+      print('WebSocket connected successfully');
     } catch (e) {
       print('Failed to connect: $e');
       _isConnected = false;
+    }
+  }
+
+  Future<void> reconnect() async {
+    print('Reconnecting to WebSocket...');
+    await _streamSubscription?.cancel();
+    await _heartbeatTimer?.cancel();
+
+    if (_sessionId != null) {
+      await _connect(_sessionId!);
     }
   }
 
@@ -108,13 +131,14 @@ class WebSocketService {
 
   void disconnect() {
     _heartbeatTimer?.cancel();
+    _streamSubscription?.cancel();
     _messageController?.close();
     _channel?.sink.close();
     _isConnected = false;
+    _messageController = null;
   }
 
   void dispose() {
     disconnect();
-    _messageController?.close();
   }
 }

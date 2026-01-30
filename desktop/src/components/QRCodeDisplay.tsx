@@ -11,6 +11,9 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode, sessionId 
   const handleCopySessionId = () => {
     if (window.electronAPI) {
       window.electronAPI.copyText?.(sessionId);
+    } else if (window.require) {
+      const { clipboard } = window.require('electron');
+      clipboard.writeText(sessionId);
     } else {
       navigator.clipboard.writeText(sessionId);
     }
