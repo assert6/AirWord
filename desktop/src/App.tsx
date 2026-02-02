@@ -171,6 +171,25 @@ function App() {
     }
   }, [inputMode]);
 
+  // 断开连接并重新生成二维码
+  const handleDisconnectAndReset = useCallback(async () => {
+    console.log('Disconnecting and resetting...');
+    setIsConnected(false);
+    setShowQRCode(true);
+    setInputContent('');
+    lastContentRef.current = '';
+
+    // 创建新的session
+    try {
+      const session = await api.createSession();
+      setSessionId(session.sessionId);
+      setQrCode(session.qrCode);
+      console.log('New session created:', session.sessionId);
+    } catch (error) {
+      console.error('Failed to create new session:', error);
+    }
+  }, []);
+
   if (showQRCode && qrCode) {
     return <QRCodeDisplay qrCode={qrCode} sessionId={sessionId} />;
   }
@@ -181,6 +200,7 @@ function App() {
       isConnected={isConnected}
       inputMode={inputMode}
       setInputMode={setInputMode}
+      onDisconnect={handleDisconnectAndReset}
     />
   );
 }

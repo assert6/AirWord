@@ -5,9 +5,10 @@ interface DesktopInputProps {
   isConnected: boolean;
   inputMode: 'display' | 'direct';
   setInputMode: (mode: 'display' | 'direct') => void;
+  onDisconnect: () => void;
 }
 
-export const DesktopInput: React.FC<DesktopInputProps> = ({ content, isConnected, inputMode, setInputMode }) => {
+export const DesktopInput: React.FC<DesktopInputProps> = ({ content, isConnected, inputMode, setInputMode, onDisconnect }) => {
   const [showCopyToast, setShowCopyToast] = useState(false);
 
   const handleCopy = () => {
@@ -33,19 +34,31 @@ export const DesktopInput: React.FC<DesktopInputProps> = ({ content, isConnected
       )}
 
       <div className="w-full max-w-3xl">
-        {/* 状态指示器 */}
-        <div className="mb-6 text-center">
-          {isConnected ? (
-            <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full">
-              <div className="mr-2 h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
-              已连接到App
-            </div>
-          ) : (
-            <div className="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full">
-              <div className="animate-spin mr-2 h-4 w-4 border-2 border-yellow-600 border-t-transparent rounded-full"></div>
-              等待连接...
-            </div>
-          )}
+        {/* 状态指示器和返回按钮 */}
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex-1 text-center">
+            {isConnected ? (
+              <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full">
+                <div className="mr-2 h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
+                已连接到App
+              </div>
+            ) : (
+              <div className="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full">
+                <div className="animate-spin mr-2 h-4 w-4 border-2 border-yellow-600 border-t-transparent rounded-full"></div>
+                等待连接...
+              </div>
+            )}
+          </div>
+          <button
+            onClick={onDisconnect}
+            className="ml-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors flex items-center gap-2"
+            title="断开当前连接，连接新设备"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+            </svg>
+            返回
+          </button>
         </div>
 
         {/* 模式切换 */}

@@ -68,7 +68,7 @@ class WebSocketService {
   }
 
   Future<void> reconnect() async {
-    print('Reconnecting to WebSocket...');
+    print('Reconnecting to WebSocket... ${_sessionId ?? 'null'}');
     await _streamSubscription?.cancel();
     _heartbeatTimer?.cancel();
 
