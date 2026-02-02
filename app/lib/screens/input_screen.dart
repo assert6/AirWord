@@ -100,7 +100,8 @@ class _InputScreenState extends State<InputScreen> with WidgetsBindingObserver {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: AppColors.textDark),
+                    icon:
+                        const Icon(Icons.arrow_back, color: AppColors.textDark),
                     onPressed: () {
                       _wsService.disconnect();
                       Navigator.pop(context);
@@ -119,7 +120,8 @@ class _InputScreenState extends State<InputScreen> with WidgetsBindingObserver {
                   ),
                   // 连接状态指示器
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: _isConnected
                           ? AppColors.greenAccent.withOpacity(0.1)
@@ -175,7 +177,8 @@ class _InputScreenState extends State<InputScreen> with WidgetsBindingObserver {
                   const SizedBox(width: 8),
                   if (_isConnected)
                     IconButton(
-                      icon: const Icon(Icons.link_off, color: AppColors.textGray),
+                      icon:
+                          const Icon(Icons.link_off, color: AppColors.textGray),
                       onPressed: () {
                         _wsService.disconnect();
                         Navigator.pop(context);
@@ -215,7 +218,8 @@ class _InputScreenState extends State<InputScreen> with WidgetsBindingObserver {
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primaryPurple.withOpacity(0.1),
+                                  color:
+                                      AppColors.primaryPurple.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Icon(
@@ -286,14 +290,14 @@ class _InputScreenState extends State<InputScreen> with WidgetsBindingObserver {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          Container(
-                            constraints: const BoxConstraints(
-                              minHeight: 200,
-                            ),
+                          SizedBox(
+                            height: 200,
+                            width: double.infinity,
                             child: TextField(
                               controller: _textController,
                               onChanged: _onTextChanged,
                               maxLines: null,
+                              expands: true,
                               decoration: InputDecoration(
                                 hintText: '在这里输入，内容会实时同步到桌面端...',
                                 hintStyle: TextStyle(
@@ -333,7 +337,8 @@ class _InputScreenState extends State<InputScreen> with WidgetsBindingObserver {
                         icon: const Icon(Icons.delete_outline, size: 22),
                         label: const Text(
                           '清空内容',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.textGray,

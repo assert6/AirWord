@@ -26,32 +26,34 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
-        child: SafeArea(
-          child: Center(
+        child: Center(
+          child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // 顶部环境指示器
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppConfig.isDev ? orangeAccent : greenAccent,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        AppConfig.environmentName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                  // 顶部环境指示器（仅测试环境显示）
+                  if (AppConfig.isDev)
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: orangeAccent,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          AppConfig.environmentName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
                   const SizedBox(height: 40),
 
@@ -102,24 +104,6 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 8),
-
-                  // 服务器地址显示
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      AppConfig.wsUrl,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ),
-
                   const SizedBox(height: 48),
 
                   // 扫码按钮 - 主要按钮
@@ -141,28 +125,29 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
+                        onPressed: () async {
+                          final sessionId = await Navigator.push<String>(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => QRScanScreen(
-                                onScanned: (sessionId) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          InputScreen(sessionId: sessionId),
-                                    ),
-                                  );
-                                },
-                              ),
+                              builder: (context) => const QRScanScreen(),
                             ),
                           );
+                          if (sessionId != null && context.mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    InputScreen(sessionId: sessionId),
+                              ),
+                            );
+                          }
                         },
-                        icon: const Icon(Icons.qr_code_scanner, size: 24),
+                        icon: const Icon(Icons.qr_code_scanner,
+                            size: 24, color: Colors.white),
                         label: const Text(
                           '扫描二维码',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w600),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
@@ -252,11 +237,9 @@ class HomeScreen extends StatelessWidget {
                         const SizedBox(height: 16),
                         _buildStep('1', '在桌面端或Web端打开AirWord'),
                         const SizedBox(height: 12),
-                        _buildStep('2', '生成二维码'),
+                        _buildStep('2', '使用App扫描二维码建立连接'),
                         const SizedBox(height: 12),
-                        _buildStep('3', '使用App扫描二维码建立连接'),
-                        const SizedBox(height: 12),
-                        _buildStep('4', '在App中输入，内容实时同步'),
+                        _buildStep('3', '在App中输入，内容实时同步'),
                       ],
                     ),
                   ),

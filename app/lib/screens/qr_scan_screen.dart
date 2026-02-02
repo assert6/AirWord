@@ -11,9 +11,7 @@ class AppColors {
 }
 
 class QRScanScreen extends StatefulWidget {
-  final Function(String sessionId) onScanned;
-
-  const QRScanScreen({super.key, required this.onScanned});
+  const QRScanScreen({super.key});
 
   @override
   State<QRScanScreen> createState() => _QRScanScreenState();
@@ -51,24 +49,21 @@ class _QRScanScreenState extends State<QRScanScreen> {
                   _isProcessing = true;
 
                   try {
-                    final data = json.decode(barcode.rawValue!) as Map<String, dynamic>;
+                    final data =
+                        json.decode(barcode.rawValue!) as Map<String, dynamic>;
                     print('解析后: $data');
 
-                    if (data['type'] == 'airword-session' && data['sessionId'] != null) {
+                    if (data['type'] == 'airword-session' &&
+                        data['sessionId'] != null) {
                       final sessionId = data['sessionId'] as String;
                       print('✅ Session ID: $sessionId');
 
                       controller.stop();
 
                       if (mounted) {
-                        Navigator.pop(context);
+                        // 通过 pop 的 result 传递 sessionId，由 HomeScreen 的 .then() 处理导航
+                        Navigator.pop(context, sessionId);
                       }
-
-                      Future.delayed(const Duration(milliseconds: 200), () {
-                        if (mounted) {
-                          widget.onScanned(sessionId);
-                        }
-                      });
                       return;
                     } else {
                       print('❌ 类型不匹配');
@@ -110,7 +105,8 @@ class _QRScanScreenState extends State<QRScanScreen> {
             right: 0,
             child: SafeArea(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
                     Container(
@@ -231,7 +227,8 @@ class _QRScanScreenState extends State<QRScanScreen> {
               child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),

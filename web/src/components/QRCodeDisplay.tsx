@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface QRCodeDisplayProps {
   qrCode: string;
@@ -6,8 +6,28 @@ interface QRCodeDisplayProps {
 }
 
 export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode, sessionId }) => {
+  const [showCopyToast, setShowCopyToast] = useState(false);
+
+  const handleCopySessionId = () => {
+    navigator.clipboard.writeText(sessionId);
+    setShowCopyToast(true);
+    setTimeout(() => setShowCopyToast(false), 2000);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 p-4">
+      {/* 复制成功气泡提示 */}
+      {showCopyToast && (
+        <div className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 animate-bounce">
+          <div className="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
+            <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="font-medium">Session ID 已复制！</span>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
         <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">
           AirWord
@@ -28,10 +48,7 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode, sessionId 
           <div className="flex justify-between items-center mb-1">
             <p className="text-xs text-gray-500">会话ID (调试用)</p>
             <button
-              onClick={() => {
-                navigator.clipboard.writeText(sessionId);
-                alert('Session ID 已复制！');
-              }}
+              onClick={handleCopySessionId}
               className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
             >
               复制
