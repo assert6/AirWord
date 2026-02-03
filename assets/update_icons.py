@@ -135,9 +135,8 @@ def generate_ios_icons(source_image: Path):
 
     for filename, size in config["sizes"].items():
         output_path = config["base_path"] / filename
-        # iOS App Store 1024x1024 图标不能包含alpha通道
-        remove_alpha = (size == (1024, 1024))
-        resize_image(source_image, output_path, size, remove_alpha=remove_alpha)
+        # iOS 所有图标都不能包含alpha通道
+        resize_image(source_image, output_path, size, remove_alpha=True)
 
     # 更新 Contents.json
     contents_json = '''{
