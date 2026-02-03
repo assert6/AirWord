@@ -8,11 +8,13 @@ class WebSocketService {
   WebSocketChannel? _channel;
   String? _sessionId;
   StreamController<WebSocketMessage>? _messageController;
+  StreamController<bool>? _connectionController;
   Timer? _heartbeatTimer;
   bool _isConnected = false;
   StreamSubscription? _streamSubscription;
 
   Stream<WebSocketMessage>? get messageStream => _messageController?.stream;
+  Stream<bool>? get connectionStream => _connectionController?.stream;
 
   bool get isConnected => _isConnected;
 
@@ -28,6 +30,7 @@ class WebSocketService {
 
       // 如果已存在消息控制器，不重新创建以保持订阅
       _messageController ??= StreamController<WebSocketMessage>.broadcast();
+      _connectionController ??= StreamController<bool>.broadcast();
 
       _channel = WebSocketChannel.connect(Uri.parse(AppConfig.wsUrl));
 
@@ -45,10 +48,12 @@ class WebSocketService {
         onError: (error) {
           print('WebSocket error: $error');
           _isConnected = false;
+          _connectionController?.add(false);
         },
         onDone: () {
           print('WebSocket connection closed');
           _isConnected = false;
+          _connectionController?.add(false);
           _heartbeatTimer?.cancel();
         },
       );
@@ -60,21 +65,25 @@ class WebSocketService {
       _startHeartbeat();
 
       _isConnected = true;
+      _connectionController?.add(true);
       print('WebSocket connected successfully');
     } catch (e) {
       print('Failed to connect: $e');
       _isConnected = false;
+      _connectionController?.add(false);
     }
   }
 
   Future<void> reconnect() async {
     print('Reconnecting to WebSocket... ${_sessionId ?? 'null'}');
-    await _streamSubscription?.cancel();
-    _heartbeatTimer?.cancel();
+    disconnect();
+    // await _streamSubscription?.cancel();
+    // _heartbeatTimer?.cancel();
 
     if (_sessionId != null) {
       await _connect(_sessionId!);
     }
+    print('isConnected: ${isConnected}');
   }
 
   void sendConnect() {
@@ -132,9 +141,11 @@ class WebSocketService {
     _heartbeatTimer?.cancel();
     _streamSubscription?.cancel();
     _messageController?.close();
+    _connectionController?.close();
     _channel?.sink.close();
     _isConnected = false;
     _messageController = null;
+    _connectionController = null;
   }
 
   void dispose() {

@@ -165,7 +165,6 @@ export const DesktopInput: React.FC<DesktopInputProps> = ({ content, isConnected
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-800">
                 <strong>提示:</strong> 直接输入模式会自动将App的输入通过模拟键盘发送到当前光标位置。
-                确保你的光标在想要输入的位置！
               </p>
             </div>
           </div>

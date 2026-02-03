@@ -32,16 +32,11 @@ class _InputScreenState extends State<InputScreen> with WidgetsBindingObserver {
     _wsService = WebSocketService();
     _wsService.connect(widget.sessionId);
 
-    _wsService.messageStream?.listen((message) {
-      if (message.type == 'connect') {
-        setState(() {
-          _isConnected = true;
-        });
-      } else if (message.type == 'disconnect') {
-        setState(() {
-          _isConnected = false;
-        });
-      }
+    // 监听连接状态变化
+    _wsService.connectionStream?.listen((isConnected) {
+      setState(() {
+        _isConnected = isConnected;
+      });
     });
   }
 
@@ -52,10 +47,9 @@ class _InputScreenState extends State<InputScreen> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         print('App resumed, reconnecting WebSocket...');
-        setState(() {
-          _isConnected = false;
-        });
-        _wsService.reconnect();
+        if (!_wsService.isConnected) {
+          _wsService.reconnect();
+        }
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
