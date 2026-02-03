@@ -35,10 +35,6 @@ if [ "$MODE" = "debug" ]; then
     echo ""
     echo "✅ 构建成功!"
     echo "APK 文件位置: build/app/outputs/flutter-apk/app-debug.apk"
-    echo ""
-    echo "重命名..."
-    mv build/app/outputs/flutter-apk/app-debug.apk build/app/outputs/flutter-apk/airword-dev.apk
-    echo "  -> build/app/outputs/flutter-apk/airword-dev.apk"
   else
     echo ""
     echo "❌ 构建失败!"
@@ -56,10 +52,6 @@ else
     echo ""
     echo "✅ 构建成功!"
     echo "APK 文件位置: build/app/outputs/flutter-apk/app-release.apk"
-    echo ""
-    echo "重命名..."
-    mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/airword-prod.apk
-    echo "  -> build/app/outputs/flutter-apk/airword-prod.apk"
   else
     echo ""
     echo "❌ 构建失败!"

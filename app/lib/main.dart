@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'config/app_config.dart';
 import 'screens/home_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AppConfig.initialize();
   runApp(const AirWordApp());
 }
 
