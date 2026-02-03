@@ -40,6 +40,10 @@
 
 ```
 AirWord/
+├── assets/           # 图标素材和替换脚本
+│   ├── icons/        # 主图标文件 (icon.png 1024x1024)
+│   ├── update_icons.py  # 一键替换图标脚本
+│   └── README.md     # 图标使用说明
 ├── backend/          # Node.js后端服务
 ├── web/              # Web前端应用
 ├── app/              # Flutter移动应用
@@ -178,6 +182,27 @@ flutter build ipa
 npm run electron:build
 # 生成的安装包在release目录
 ```
+
+## 🎨 替换应用图标
+
+### 1. 准备图标
+将设计好的 1024x1024 PNG 图标放入 `assets/icons/icon.png`
+
+### 2. 安装依赖
+```bash
+pip3 install Pillow
+```
+
+### 3. 一键替换
+```bash
+./update-icons.sh
+# 或
+python3 assets/update_icons.py
+```
+
+脚本会自动替换 App、Desktop、Web 三个端的所有图标尺寸。
+
+详细说明请查看 [assets/README.md](assets/README.md)
 
 ## 安全考虑
 

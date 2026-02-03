@@ -71,7 +71,7 @@ function App() {
 
               if (window.electronAPI) {
                 window.electronAPI.typeText(newChars).then(result => {
-                  // console.log('Type result:', result);
+                  console.log('Type result:', result);
                 }).catch(err => {
                   console.error('Type error:', err);
                 });
@@ -85,7 +85,7 @@ function App() {
 
               if (window.electronAPI) {
                 window.electronAPI.deleteText(deleteCount).then(result => {
-                  // console.log('Delete result:', result);
+                  console.log('Delete result:', result);
                 }).catch(err => {
                   console.error('Delete error:', err);
                 });

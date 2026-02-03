@@ -19,7 +19,8 @@
       "Bash(npm install:*)",
       "Bash(flutter analyze:*)",
       "Bash(flutter pub get:*)",
-      "Bash(flutter clean:*)"
+      "Bash(flutter clean:*)",
+      "Bash(tree:*)"
     ]
   }
 }
