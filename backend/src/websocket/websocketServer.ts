@@ -78,8 +78,8 @@ export class WebSocketServer {
 
     // 绑定客户端到session（如果还没绑定）
     if (clientType === 'app') {
-      if (!session.appClient || session.appClient !== ws) {
-        const bound = sessionManager.bindAppClient(sessionId, ws);
+      if (!session.appClient || session.appClient !== (ws as WebSocket)) {
+        const bound = sessionManager.bindAppClient(sessionId, ws as WebSocket);
         if (!bound) {
           ws.send(JSON.stringify({
             type: 'error',
@@ -90,8 +90,8 @@ export class WebSocketServer {
         }
       }
     } else if (clientType === 'web' || clientType === 'desktop') {
-      if (!session.webClient || session.webClient !== ws) {
-        sessionManager.bindWebClient(sessionId, ws);
+      if (!session.webClient || session.webClient !== (ws as WebSocket)) {
+        sessionManager.bindWebClient(sessionId, ws as WebSocket);
       }
     }
 

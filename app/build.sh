@@ -42,8 +42,8 @@ if [ "$MODE" = "debug" ]; then
   fi
 else
   echo "正式版配置:"
-  echo "  - WebSocket: ws://airword.assert6.com:3001"
-  echo "  - API: http://airword.assert6.com:3001/api"
+  echo "  - WebSocket: wss://airword.assert6.com"
+  echo "  - API: https://airword.assert6.com/api"
   echo ""
   echo "开始构建 Android APK (release)..."
   flutter build apk --release

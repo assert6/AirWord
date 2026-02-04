@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import WebSocket from 'ws';
 import { generateSessionId } from '../utils/uuid';
 
 export interface Session {
@@ -52,7 +52,7 @@ class SessionManager {
     }
 
     // 检查是否已有App连接
-    if (session.appClient && session.appClient.readyState === WebSocket.OPEN) {
+    if (session.appClient && session.appClient.readyState === 1) {
       console.log(`App client already connected to session: ${sessionId}, rejecting new connection`);
       return false;
     }

@@ -7,8 +7,8 @@
 - API: `http://airword-dev.assert6.com:3001/api`
 
 ### 正式环境
-- WebSocket: `ws://airword.assert6.com:3001`
-- API: `http://airword.assert6.com:3001/api`
+- WebSocket: `wss://airword.assert6.com`
+- API: `https://airword.assert6.com/api`
 
 ## 环境配置
 
@@ -36,7 +36,7 @@ npm run build
 
 访问地址：
 - 测试环境: http://airword-dev.assert6.com:3001
-- 正式环境: http://airword.assert6.com:3001
+- 正式环境: https://airword.assert6.com
 
 ### 3. 编译Android App
 

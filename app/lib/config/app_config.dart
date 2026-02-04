@@ -24,13 +24,13 @@ class AppConfig {
 
   // WebSocket服务器地址
   static const String wsUrlDev = 'ws://airword-dev.assert6.com:3001';  // 测试服务器
-  static const String wsUrlProd = 'ws://airword.assert6.com:3001';  // 正式服务器
+  static const String wsUrlProd = 'wss://airword.assert6.com';  // 正式服务器
 
   static String get wsUrl => isDev ? wsUrlDev : wsUrlProd;
 
   // API服务器地址
   static const String apiUrlDev = 'http://airword-dev.assert6.com:3001/api';
-  static const String apiUrlProd = 'http://airword.assert6.com:3001/api';
+  static const String apiUrlProd = 'https://airword.assert6.com/api';
 
   static String get apiUrl => isDev ? apiUrlDev : apiUrlProd;
 
