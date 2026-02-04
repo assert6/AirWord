@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build
 
 # 生产阶段 - 使用 Nginx
-FROM nginx:alpine
+FROM nginx
 
 # 复制自定义 nginx 配置
 COPY nginx.conf /etc/nginx/conf.d/default.conf
@@ -31,3 +31,4 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 
 # docker build -t airword-web --platform=linux/amd64 .
+# docker run -d --rm -p 127.0.0.1:3721:80 --name airword-web airword-web

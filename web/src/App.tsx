@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { QRCodeDisplay } from './components/QRCodeDisplay';
 import { InputDisplay } from './components/InputDisplay';
 import { useWebSocket } from './services/websocket';

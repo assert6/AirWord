@@ -1,7 +1,10 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { WebSocketMessage } from '../types';
 
-const WS_URL = `ws://localhost:3001`;
+// 根据当前环境自动判断 WebSocket 地址
+const WS_URL = import.meta.env.DEV
+  ? `ws://${window.location.host}:3001`
+  : `wss://${window.location.host}/ws`;
 
 export function useWebSocket(
   sessionId: string,
@@ -10,8 +13,8 @@ export function useWebSocket(
   onDisconnect: () => void
 ) {
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
-  const heartbeatIntervalRef = useRef<NodeJS.Timeout>();
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -64,6 +67,7 @@ export function useWebSocket(
 
       if (heartbeatIntervalRef.current) {
         clearInterval(heartbeatIntervalRef.current);
+        heartbeatIntervalRef.current = null;
       }
 
       // 5秒后尝试重连
@@ -79,9 +83,11 @@ export function useWebSocket(
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
     }
     if (heartbeatIntervalRef.current) {
       clearInterval(heartbeatIntervalRef.current);
+      heartbeatIntervalRef.current = null;
     }
     if (wsRef.current) {
       wsRef.current.close();

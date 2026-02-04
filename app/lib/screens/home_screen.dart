@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:airword_app/config/app_config.dart';
+import '../config/app_config.dart';
 import 'qr_scan_screen.dart';
 import 'input_screen.dart';
 
