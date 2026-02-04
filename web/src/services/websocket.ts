@@ -3,7 +3,7 @@ import { WebSocketMessage } from '../types';
 
 // 根据当前环境自动判断 WebSocket 地址
 const WS_URL = import.meta.env.DEV
-  ? `ws://${window.location.host}:3001`
+  ? `ws://localhost:3001`
   : `wss://${window.location.host}/ws`;
 
 export function useWebSocket(
