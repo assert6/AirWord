@@ -1,5 +1,5 @@
-name: airword_app
-description: AirWord App - 实时输入同步
+name: AirWord
+description: AirWord 字符流动 实时输入同步
 publish_to: 'none'
 version: 1.0.0+2
 
