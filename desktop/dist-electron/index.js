@@ -1,1 +1,0 @@
-"use strict";const t=require("electron");t.contextBridge.exposeInMainWorld("electronAPI",{typeText:e=>t.ipcRenderer.invoke("type-text",e),deleteText:e=>t.ipcRenderer.invoke("delete-text",e),copyText:e=>t.clipboard.writeText(e)});
