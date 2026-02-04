@@ -38,3 +38,5 @@ EXPOSE 3001
 
 # 启动命令
 CMD ["node", "dist/index.js"]
+
+# docker run -d -p 127.0.0.1:3001:3001 airword-backend
