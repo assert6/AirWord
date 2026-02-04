@@ -1,7 +1,9 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { WebSocketMessage } from '../types';
 
-const WS_URL = `ws://localhost:3001`;
+const WS_URL = import.meta.env.DEV
+  ? 'ws://airword-dev.assert6.com:3001'
+  : 'wss://airword.assert6.com';
 
 export function useWebSocket(
   sessionId: string,

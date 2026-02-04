@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.DEV
+  ? 'https://airword-dev.assert6.com/api'
+  : 'https://airword.assert6.com/api';
 
 export const api = {
   async createSession() {

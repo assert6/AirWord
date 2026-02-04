@@ -23,7 +23,7 @@ export const DesktopInput: React.FC<DesktopInputProps> = ({ content, isConnected
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-4">
       {/* 复制成功提示气泡 */}
       {showCopyToast && (
-        <div className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 animate-bounce">
+        <div className="fixed top-8 inset-x-0 flex justify-center z-50 animate-bounce">
           <div className="bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
             <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -35,8 +35,21 @@ export const DesktopInput: React.FC<DesktopInputProps> = ({ content, isConnected
 
       <div className="w-full max-w-3xl">
         {/* 状态指示器和返回按钮 */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex-1 text-center">
+        <div className="mb-6 relative">
+          {/* 返回按钮 - 绝对定位 */}
+          <button
+            onClick={onDisconnect}
+            className="absolute left-0 top-1/2 -translate-y-1/2 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors flex items-center gap-2 z-10"
+            title="断开当前连接，连接新设备"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+            </svg>
+            返回
+          </button>
+
+          {/* 状态指示器 - 页面宽度居中 */}
+          <div className="w-full text-center">
             {isConnected ? (
               <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full">
                 <div className="mr-2 h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
@@ -49,16 +62,6 @@ export const DesktopInput: React.FC<DesktopInputProps> = ({ content, isConnected
               </div>
             )}
           </div>
-          <button
-            onClick={onDisconnect}
-            className="ml-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors flex items-center gap-2"
-            title="断开当前连接，连接新设备"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-            </svg>
-            返回
-          </button>
         </div>
 
         {/* 模式切换 */}

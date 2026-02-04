@@ -9,16 +9,13 @@ function createWindow() {
   const { screen } = require('electron');
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
-  const isDev = process.env.VITE_DEV_SERVER_URL;
-
   mainWindow = new BrowserWindow({
     width: Math.min(1000, width * 0.7),
     height: Math.min(900, height * 0.8),
     minWidth: 800,
     minHeight: 700,
+    title: 'AirWord Desktop',
     webPreferences: {
-      // 开发环境：使用nodeIntegration，生产环境：使用preload
-      preload: isDev ? undefined : path.join(__dirname, '../preload/index.js'),
       contextIsolation: false,
       nodeIntegration: true,
       nodeIntegrationInWorker: true,
@@ -32,25 +29,7 @@ function createWindow() {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
-  }
-
-  // 调试：打印preload路径
-  console.log('Preload path:', path.join(__dirname, '../preload/index.js'));
-  console.log('__dirname:', __dirname);
-
-  // 监听preload加载错误
-  mainWindow.webContents.on('preload-error', (event) => {
-    console.error('Preload error:', event);
-  });
-
-
-  // 开发环境加载Vite开发服务器
-  if (process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-    mainWindow.webContents.openDevTools();
-  } else {
-    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 
   mainWindow.on('closed', () => {
