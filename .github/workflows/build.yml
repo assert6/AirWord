@@ -210,9 +210,6 @@ jobs:
       - name: Get Flutter dependencies
         run: flutter pub get
 
-      - name: Build Android APK (Debug)
-        run: flutter build apk --debug
-
       - name: Build Android APK (Release)
         run: flutter build apk --release
 
@@ -221,7 +218,6 @@ jobs:
         with:
           name: android-apk
           path: |
-            app/build/app/outputs/flutter-apk/app-debug.apk
             app/build/app/outputs/flutter-apk/app-release.apk
           retention-days: 7
           if-no-files-found: ignore
