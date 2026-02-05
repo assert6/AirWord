@@ -30,5 +30,5 @@ EXPOSE 80
 # 启动 nginx
 CMD ["nginx", "-g", "daemon off;"]
 
-# docker build -t airword-web --platform=linux/amd64 .
+# docker build -t airword-web --platform=linux/amd64 . && docker tag airword-web ccr.ccs.tencentyun.com/likeshop/airword-web && docker push ccr.ccs.tencentyun.com/likeshop/airword-web && docker rmi ccr.ccs.tencentyun.com/likeshop/airword-web
 # docker run -d --rm -p 127.0.0.1:3721:80 --name airword-web airword-web
