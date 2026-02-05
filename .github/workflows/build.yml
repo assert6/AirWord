@@ -1,0 +1,298 @@
+name: Build All Platforms
+
+on:
+  push:
+    branches: [main, master, develop]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+  pull_request:
+    branches: [main, master]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+  workflow_dispatch:
+    inputs:
+      build_desktop:
+        description: 'Build Desktop (Electron)'
+        type: boolean
+        default: true
+      build_web:
+        description: 'Build Web'
+        type: boolean
+        default: true
+      build_android:
+        description: 'Build Android'
+        type: boolean
+        default: true
+      build_ios:
+        description: 'Build iOS'
+        type: boolean
+        default: false
+
+jobs:
+  # ==================== Web Build ====================
+  build-web:
+    name: Build Web
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch' || inputs.build_web
+    defaults:
+      run:
+        working-directory: ./web
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './web/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Web
+        run: npm run build
+
+      - name: Upload Web artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: web/dist/
+          retention-days: 7
+
+  # ==================== Desktop Build (macOS) ====================
+  build-desktop-macos:
+    name: Build Desktop (macOS)
+    runs-on: macos-latest
+    if: github.event_name != 'workflow_dispatch' || inputs.build_desktop
+    defaults:
+      run:
+        working-directory: ./desktop
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './desktop/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Desktop (macOS)
+        run: npm run electron:build
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-macos
+          path: |
+            desktop/release/*.dmg
+            desktop/release/*.zip
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ==================== Desktop Build (Windows) ====================
+  build-desktop-windows:
+    name: Build Desktop (Windows)
+    runs-on: windows-latest
+    if: github.event_name != 'workflow_dispatch' || inputs.build_desktop
+    defaults:
+      run:
+        working-directory: ./desktop
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './desktop/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Desktop (Windows)
+        run: npm run electron:build -- --win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-windows
+          path: |
+            desktop/release/*.exe
+            desktop/release/*.zip
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ==================== Desktop Build (Linux) ====================
+  build-desktop-linux:
+    name: Build Desktop (Linux)
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch' || inputs.build_desktop
+    defaults:
+      run:
+        working-directory: ./desktop
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './desktop/package-lock.json'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libarchive-tools rpm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Desktop (Linux)
+        run: npm run electron:build -- --linux
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-linux
+          path: |
+            desktop/release/*.AppImage
+            desktop/release/*.deb
+            desktop/release/*.rpm
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ==================== Android Build ====================
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch' || inputs.build_android
+    defaults:
+      run:
+        working-directory: ./app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Android APK (Debug)
+        run: flutter build apk --debug
+
+      - name: Build Android APK (Release)
+        run: flutter build apk --release
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: |
+            app/build/app/outputs/flutter-apk/app-debug.apk
+            app/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ==================== iOS Build ====================
+  build-ios:
+    name: Build iOS
+    runs-on: macos-latest
+    if: (github.event_name != 'workflow_dispatch' || inputs.build_ios) && false  # 默认禁用，需要配置证书
+    defaults:
+      run:
+        working-directory: ./app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Ruby (for CocoaPods)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: true
+
+      - name: Install CocoaPods
+        run: |
+          sudo gem install cocoapods
+          pod setup
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Install iOS dependencies
+        run: |
+          cd ios
+          pod install
+
+      # 注意：iOS 构建需要有效的开发者证书和配置文件
+      # 以下步骤需要配置 GitHub Secrets 后才能使用
+      # - name: Import Certificates
+      #   uses: apple-actions/import-codesign-certs@v2
+      #   with:
+      #     p12-file-base64: ${{ secrets.IOS_P12_BASE64 }}
+      #     p12-password: ${{ secrets.IOS_P12_PASSWORD }}
+      #
+      # - name: Install Provisioning Profile
+      #   uses: apple-actions/download-provisioning-profiles@v1
+      #   with:
+      #     bundle-id: com.yourcompany.airword
+      #     issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+      #     api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+      #     api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+
+      - name: Build iOS (No Code Sign)
+        run: flutter build ios --no-codesign
+
+      - name: Upload iOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build
+          path: app/build/ios/iphoneos/
+          retention-days: 7
+          if-no-files-found: ignore

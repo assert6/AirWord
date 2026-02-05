@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain, globalShortcut } from 'electron';
-import * as robot from 'robotjs';
+import { keyboard, Key } from '@nut-tree-fork/nut-js';
 import path from 'path';
 
 let mainWindow: BrowserWindow | null = null;
@@ -73,7 +73,7 @@ app.on('will-quit', () => {
 ipcMain.handle('type-text', async (_event, text: string) => {
   console.log('Main: type-text called with:', text);
   try {
-    robot.typeString(text);
+    await keyboard.type(text);
     console.log('Main: type-text success');
     return { success: true };
   } catch (error) {
@@ -86,7 +86,7 @@ ipcMain.handle('delete-text', async (_event, count: number) => {
   console.log('Main: delete-text called with count:', count);
   try {
     for (let i = 0; i < count; i++) {
-      robot.keyTap('backspace');
+      await keyboard.type(Key.Backspace);
     }
     console.log('Main: delete-text success');
     return { success: true };

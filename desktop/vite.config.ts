@@ -15,7 +15,7 @@ export default defineConfig({
       vite: {
         build: {
           rollupOptions: {
-            external: ['robotjs']
+            external: ['@nut-tree-fork/nut-js']
           }
         }
       }
