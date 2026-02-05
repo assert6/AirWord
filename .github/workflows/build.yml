@@ -32,9 +32,6 @@ jobs:
     name: Build Web
     runs-on: ubuntu-latest
     if: github.event_name != 'workflow_dispatch' || inputs.build_web
-    defaults:
-      run:
-        working-directory: ./web
 
     steps:
       - name: Checkout code
@@ -59,9 +56,11 @@ jobs:
           cache-dependency-path: './web/package-lock.json'
 
       - name: Install dependencies
+        working-directory: ./web
         run: npm ci
 
       - name: Build Web
+        working-directory: ./web
         run: npm run build
 
       - name: Upload Web artifacts
@@ -76,9 +75,6 @@ jobs:
     name: Build Desktop (macOS)
     runs-on: macos-latest
     if: github.event_name != 'workflow_dispatch' || inputs.build_desktop
-    defaults:
-      run:
-        working-directory: ./desktop
 
     steps:
       - name: Checkout code
@@ -103,10 +99,12 @@ jobs:
           cache-dependency-path: './desktop/package-lock.json'
 
       - name: Install dependencies
+        working-directory: ./desktop
         run: npm ci
 
       - name: Build Desktop (macOS)
-        run: npm run electron:build
+        working-directory: ./desktop
+        run: npm run electron:build -- --mac
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -125,9 +123,6 @@ jobs:
     name: Build Desktop (Windows)
     runs-on: windows-latest
     if: github.event_name != 'workflow_dispatch' || inputs.build_desktop
-    defaults:
-      run:
-        working-directory: ./desktop
 
     steps:
       - name: Checkout code
@@ -152,9 +147,11 @@ jobs:
           cache-dependency-path: './desktop/package-lock.json'
 
       - name: Install dependencies
+        working-directory: ./desktop
         run: npm ci
 
       - name: Build Desktop (Windows)
+        working-directory: ./desktop
         run: npm run electron:build -- --win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -169,15 +166,11 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
-
   # ==================== Android Build ====================
   build-android:
     name: Build Android
     runs-on: ubuntu-latest
     if: github.event_name != 'workflow_dispatch' || inputs.build_android
-    defaults:
-      run:
-        working-directory: ./app
 
     steps:
       - name: Checkout code
@@ -208,9 +201,11 @@ jobs:
           java-version: '17'
 
       - name: Get Flutter dependencies
+        working-directory: ./app
         run: flutter pub get
 
       - name: Build Android APK (Release)
+        working-directory: ./app
         run: flutter build apk --release
 
       - name: Upload Android artifacts
@@ -227,9 +222,6 @@ jobs:
     name: Build iOS
     runs-on: macos-latest
     if: (github.event_name != 'workflow_dispatch' || inputs.build_ios) && false  # 默认禁用，需要配置证书
-    defaults:
-      run:
-        working-directory: ./app
 
     steps:
       - name: Checkout code
@@ -265,12 +257,12 @@ jobs:
           pod setup
 
       - name: Get Flutter dependencies
+        working-directory: ./app
         run: flutter pub get
 
       - name: Install iOS dependencies
-        run: |
-          cd ios
-          pod install
+        working-directory: ./app/ios
+        run: pod install
 
       # 注意：iOS 构建需要有效的开发者证书和配置文件
       # 以下步骤需要配置 GitHub Secrets 后才能使用
@@ -289,6 +281,7 @@ jobs:
       #     api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
 
       - name: Build iOS (No Code Sign)
+        working-directory: ./app
         run: flutter build ios --no-codesign
 
       - name: Upload iOS artifacts
