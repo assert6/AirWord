@@ -28,12 +28,6 @@ class AppConfig {
 
   static String get wsUrl => isDev ? wsUrlDev : wsUrlProd;
 
-  // API服务器地址
-  static const String apiUrlDev = 'http://airword-dev.assert6.com:3001/api';
-  static const String apiUrlProd = 'https://airword.assert6.com/api';
-
-  static String get apiUrl => isDev ? apiUrlDev : apiUrlProd;
-
   // 当前环境名称
   static String get environmentName => isDev ? '测试环境' : '正式环境';
 
