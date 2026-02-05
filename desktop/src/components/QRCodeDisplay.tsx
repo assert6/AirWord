@@ -40,8 +40,15 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ qrCode, sessionId 
       )}
 
       <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">
-          AirWord Desktop
+        <h1 className="text-3xl font-bold mb-2 text-center">
+          <span
+              style={{
+                background: 'linear-gradient(135deg, #9333EA 0%, #4F46E5 50%, #10B981 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}
+          >AirWord</span>
         </h1>
         <p className="text-gray-600 text-center mb-8">
           使用App扫描二维码建立连接

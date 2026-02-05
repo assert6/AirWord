@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.DEV
-  ? 'https://airword-dev.assert6.com/api'
+  ? 'http://airword-dev.assert6.com:3001/api'
   : 'https://airword.assert6.com/api';
 
 export const api = {

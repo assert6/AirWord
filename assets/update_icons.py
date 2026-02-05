@@ -65,6 +65,18 @@ ICONS_CONFIG = {
             "android-chrome-192x192.png": (192, 192),
             "android-chrome-512x512.png": (512, 512),
         }
+    },
+    "website": {
+        "base_path": ROOT_DIR / "website/assets/icons",
+        "sizes": {
+            "favicon.ico": [(16, 16), (32, 32), (48, 48)],
+            "favicon-16x16.png": (16, 16),
+            "favicon-32x32.png": (32, 32),
+            "apple-touch-icon.png": (180, 180),
+            "icon-192x192.png": (192, 192),
+            "icon-512x512.png": (512, 512),
+            "logo.png": (200, 200),  # 网站logo
+        }
     }
 }
 
@@ -380,6 +392,58 @@ def generate_web_icons(source_image: Path):
         print(f"  ⚠ favicon.ico 生成失败: {e}")
 
 
+def generate_website_icons(source_image: Path):
+    """生成 Website 官网图标"""
+    print("\n🌍 生成 Website 官网图标...")
+    config = ICONS_CONFIG["website"]
+    config["base_path"].mkdir(parents=True, exist_ok=True)
+
+    # 生成各种尺寸的 PNG 图标
+    for filename, size in config["sizes"].items():
+        if filename == "favicon.ico":
+            continue  # favicon.ico 单独处理
+        output_path = config["base_path"] / filename
+        resize_image(source_image, output_path, size)
+
+    # 生成 favicon.ico (多尺寸)
+    try:
+        with Image.open(source_image) as img:
+            sizes_ico = [(16, 16), (32, 32), (48, 48)]
+            imgs = []
+            for size in sizes_ico:
+                resized = img.resize(size, Image.Resampling.LANCZOS)
+                if resized.mode != 'RGBA':
+                    resized = resized.convert('RGBA')
+                imgs.append(resized)
+
+            imgs[0].save(
+                config["base_path"] / "favicon.ico",
+                format='ICO',
+                sizes=sizes_ico,
+                append_images=imgs[1:]
+            )
+            print("  ✓ favicon.ico")
+    except Exception as e:
+        print(f"  ⚠ favicon.ico 生成失败: {e}")
+
+    # 生成 logo.svg (使用简单的 SVG 占位，实际使用时可以替换为真实的 SVG)
+    svg_content = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9333EA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4F46E5;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect x="5" y="5" width="90" height="90" rx="20" fill="url(#grad)"/>
+  <path d="M50 25 L70 75 L60 75 L55 60 L35 60 L30 75 L20 75 L40 25 Z M45 35 L37 52 L53 52 Z" fill="white"/>
+</svg>'''
+    try:
+        (config["base_path"] / "logo.svg").write_text(svg_content)
+        print("  ✓ logo.svg")
+    except Exception as e:
+        print(f"  ⚠ logo.svg 生成失败: {e}")
+
+
 def main():
     """主函数"""
     print("=" * 50)
@@ -412,6 +476,7 @@ def main():
     generate_ios_icons(source_image)
     generate_desktop_icons(source_image)
     generate_web_icons(source_image)
+    generate_website_icons(source_image)
 
     print("\n" + "=" * 50)
     print("✅ 图标替换完成!")

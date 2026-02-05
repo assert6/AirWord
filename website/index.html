@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirWord - 让输入更简单</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans SC', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            purple: '#9333EA',
+                            indigo: '#4F46E5',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'shimmer': 'shimmer 2s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #9333EA 0%, #4F46E5 50%, #10B981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #9333EA 0%, #4F46E5 100%);
+        }
+        .gradient-border {
+            background: linear-gradient(135deg, #9333EA 0%, #4F46E5 100%);
+            padding: 2px;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .mesh-bg {
+            background-image:
+                radial-gradient(at 40% 20%, rgba(147, 51, 234, 0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(147, 51, 234, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 50%, rgba(79, 70, 229, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(147, 51, 234, 0.15) 0px, transparent 50%);
+        }
+        .noise-overlay {
+            position: relative;
+        }
+        .noise-overlay::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(147, 51, 234, 0.25);
+        }
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .btn-shine:hover::after {
+            left: 100%;
+        }
+        .platform-icon {
+            transition: transform 0.3s ease;
+        }
+        .platform-card:hover .platform-icon {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-gray-800 bg-white noise-overlay">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-effect">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="#" class="flex items-center space-x-2">
+                    <img src="assets/icons/logo.png" alt="AirWord" class="w-10 h-10 rounded-xl">
+                    <span class="text-xl font-bold gradient-text">AirWord</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-600 hover:text-primary-purple transition-colors">功能特点</a>
+                    <a href="#download" class="text-gray-600 hover:text-primary-purple transition-colors">下载</a>
+                    <a href="#web" class="px-4 py-2 rounded-lg gradient-bg text-white font-medium hover:opacity-90 transition-opacity">在线使用</a>
+                </div>
+                <button class="md:hidden p-2" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden glass-effect border-t border-gray-200/20">
+            <div class="px-4 py-3 space-y-2">
+                <a href="#features" class="block py-2 text-gray-600">功能特点</a>
+                <a href="#download" class="block py-2 text-gray-600">下载</a>
+                <a href="#web" class="block py-2 text-primary-purple font-medium">在线使用</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center pt-16 mesh-bg overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute top-20 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
+            <div class="absolute top-40 right-10 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style="animation-delay: 2s;"></div>
+            <div class="absolute -bottom-8 left-1/2 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style="animation-delay: 4s;"></div>
+        </div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+            <div class="inline-flex items-center px-4 py-2 rounded-full bg-purple-100 text-purple-700 text-sm font-medium mb-8">
+                <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+                全新版本 v1.0 正式发布
+            </div>
+
+            <img src="assets/icons/icon-192x192.png" alt="AirWord" class="w-24 h-24 md:w-32 md:h-32 mx-auto mb-8 rounded-3xl shadow-2xl shadow-purple-500/30">
+
+            <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
+                <span class="gradient-text">AirWord</span>
+            </h1>
+            <p class="text-2xl md:text-3xl text-gray-600 mb-4 font-light">
+                让输入更简单
+            </p>
+            <p class="text-lg text-gray-500 mb-12 max-w-2xl mx-auto">
+                手机秒变无线键盘，扫码即连，实时同步输入到电脑。<br class="hidden md:block">
+                无需安装驱动，跨平台支持，让文字输入前所未有的便捷。
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="#download" class="btn-shine px-8 py-4 rounded-2xl gradient-bg text-white font-bold text-lg hover:shadow-2xl hover:shadow-purple-500/30 transition-all transform hover:-translate-y-1">
+                    立即下载
+                </a>
+                <a href="#web" class="px-8 py-4 rounded-2xl bg-white border-2 border-purple-200 text-gray-700 font-bold text-lg hover:border-purple-400 hover:bg-purple-50 transition-all">
+                    在线体验
+                </a>
+            </div>
+
+            <!-- Stats -->
+            <div class="mt-20 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+                <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-bold gradient-text">3</div>
+                    <div class="text-sm text-gray-500 mt-1">支持平台</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-bold gradient-text">0</div>
+                    <div class="text-sm text-gray-500 mt-1">安装驱动</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-bold gradient-text">&lt;1s</div>
+                    <div class="text-sm text-gray-500 mt-1">连接速度</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">为什么选择 AirWord</span>
+                </h2>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                    打破设备界限，让手机成为你最便捷的输入工具
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white rounded-3xl p-8 shadow-lg card-hover">
+                    <div class="w-14 h-14 rounded-2xl gradient-bg flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">扫码即连</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        无需复杂配置，打开手机 App 扫描二维码即可建立连接。采用 WebSocket 实时通信，延迟低至毫秒级。
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-white rounded-3xl p-8 shadow-lg card-hover">
+                    <div class="w-14 h-14 rounded-2xl gradient-bg flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">跨平台支持</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        支持 Windows、macOS、Linux 桌面端，以及所有现代浏览器。手机端支持 iOS 和 Android，真正做到全平台覆盖。
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-white rounded-3xl p-8 shadow-lg card-hover">
+                    <div class="w-14 h-14 rounded-2xl gradient-bg flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">实时同步</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        输入内容实时同步到目标设备，支持文字输入和删除操作。智能心跳保活，断线自动重连，体验流畅无感知。
+                    </p>
+                </div>
+            </div>
+
+            <!-- How it works -->
+            <div class="mt-24">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                        <span class="gradient-text">三步开始使用</span>
+                    </h2>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 relative">
+                    <!-- Connection line -->
+                    <div class="hidden md:block absolute top-1/4 left-1/3 right-1/3 h-0.5 bg-gradient-to-r from-purple-200 via-purple-400 to-purple-200"></div>
+
+                    <div class="text-center relative">
+                        <div class="w-20 h-20 rounded-full gradient-bg flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold shadow-lg shadow-purple-500/30">1</div>
+                        <h3 class="text-xl font-bold mb-2">打开网页</h3>
+                        <p class="text-gray-600">在电脑浏览器访问 AirWord 网页，或打开桌面客户端</p>
+                    </div>
+
+                    <div class="text-center relative">
+                        <div class="w-20 h-20 rounded-full gradient-bg flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold shadow-lg shadow-purple-500/30">2</div>
+                        <h3 class="text-xl font-bold mb-2">扫码连接</h3>
+                        <p class="text-gray-600">使用手机 App 扫描屏幕上显示的二维码</p>
+                    </div>
+
+                    <div class="text-center relative">
+                        <div class="w-20 h-20 rounded-full gradient-bg flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold shadow-lg shadow-purple-500/30">3</div>
+                        <h3 class="text-xl font-bold mb-2">开始输入</h3>
+                        <p class="text-gray-600">在手机上输入，内容实时同步到电脑光标处</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">下载 AirWord</span>
+                </h2>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                    选择适合你的平台，开始无缝输入体验
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- PC Download -->
+                <div class="platform-card group relative bg-gradient-to-br from-gray-50 to-white rounded-3xl p-8 border border-gray-100 hover:border-purple-200 transition-all card-hover">
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="relative">
+                        <div class="platform-icon w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">PC 客户端</h3>
+                        <p class="text-gray-500 text-sm mb-6">Windows & macOS</p>
+                        <button class="w-full py-3 rounded-xl gradient-bg text-white font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all btn-shine">
+                            下载客户端
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Web -->
+                <div id="web" class="platform-card group relative bg-gradient-to-br from-purple-50 to-indigo-50 rounded-3xl p-8 border-2 border-purple-200 card-hover">
+                    <div class="absolute top-4 right-4">
+                        <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">推荐</span>
+                    </div>
+                    <div class="relative">
+                        <div class="platform-icon w-16 h-16 rounded-2xl gradient-bg flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Web 端</h3>
+                        <p class="text-gray-500 text-sm mb-6">无需安装，即开即用</p>
+                        <a href="https://airword.assert6.com" target="_blank" class="block w-full py-3 rounded-xl bg-white border-2 border-purple-200 text-purple-700 font-semibold text-center hover:bg-purple-50 transition-all">
+                            在线使用
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Android -->
+                <div class="platform-card group relative bg-gradient-to-br from-gray-50 to-white rounded-3xl p-8 border border-gray-100 hover:border-purple-200 transition-all card-hover">
+                    <div class="relative">
+                        <div class="platform-icon w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Android</h3>
+                        <p class="text-gray-500 text-sm mb-6">APK 下载</p>
+                        <button class="w-full py-3 rounded-xl bg-gray-800 text-white font-semibold hover:bg-gray-900 transition-all">
+                            下载 APK
+                        </button>
+                    </div>
+                </div>
+
+                <!-- iOS -->
+                <div class="platform-card group relative bg-gradient-to-br from-gray-50 to-white rounded-3xl p-8 border border-gray-100 hover:border-purple-200 transition-all card-hover">
+                    <div class="relative">
+                        <div class="platform-icon w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">iOS</h3>
+                        <p class="text-gray-500 text-sm mb-6">App Store</p>
+                        <a href="https://apps.apple.com" target="_blank" class="block w-full py-3 rounded-xl bg-gray-800 text-white font-semibold text-center hover:bg-gray-900 transition-all">
+                            前往 App Store
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases -->
+    <section class="py-24 bg-gray-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    适用场景
+                </h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                    无论你是程序员、作家还是普通用户，AirWord 都能提升你的输入效率
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-gray-800 rounded-2xl p-6 hover:bg-gray-750 transition-colors">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold mb-2">远程开发</h3>
+                    <p class="text-gray-400 text-sm">SSH 到服务器时，用手机输入中文和特殊符号</p>
+                </div>
+
+                <div class="bg-gray-800 rounded-2xl p-6 hover:bg-gray-750 transition-colors">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold mb-2">内容创作</h3>
+                    <p class="text-gray-400 text-sm">在电脑上写作，用手机语音输入或手写转文字</p>
+                </div>
+
+                <div class="bg-gray-800 rounded-2xl p-6 hover:bg-gray-750 transition-colors">
+                    <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold mb-2">会议演示</h3>
+                    <p class="text-gray-400 text-sm">投屏演示时，用手机控制输入，无需走到电脑前</p>
+                </div>
+
+                <div class="bg-gray-800 rounded-2xl p-6 hover:bg-gray-750 transition-colors">
+                    <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold mb-2">客服办公</h3>
+                    <p class="text-gray-400 text-sm">快速回复客户，利用手机输入法的快捷短语功能</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-50 border-t border-gray-200 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <a href="#" class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <img src="assets/icons/logo.png" alt="AirWord" class="w-8 h-8 rounded-lg">
+                    <span class="text-lg font-bold gradient-text">AirWord</span>
+                </a>
+
+                <div class="flex space-x-6 text-sm text-gray-500">
+                    <a href="#" class="hover:text-purple-600 transition-colors">使用文档</a>
+                    <a href="#" class="hover:text-purple-600 transition-colors">GitHub</a>
+                    <a href="#" class="hover:text-purple-600 transition-colors">反馈问题</a>
+                    <span>© 2026 AirWord</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add scroll effect to navbar
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-lg');
+            } else {
+                nav.classList.remove('shadow-lg');
+            }
+        });
+    </script>
+</body>
+</html>

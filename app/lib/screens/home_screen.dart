@@ -56,14 +56,11 @@ class HomeScreen extends StatelessWidget {
 
                   const SizedBox(height: 40),
 
-                  // Logo/Icon - 带阴影效果
+                  // Logo/Icon - APP 图标
                   Container(
                     width: 120,
                     height: 120,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [primaryPurple, primaryIndigo],
-                      ),
                       borderRadius: BorderRadius.circular(30),
                       boxShadow: [
                         BoxShadow(
@@ -73,22 +70,38 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: const Icon(
-                      Icons.keyboard,
-                      size: 60,
-                      color: Colors.white,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(30),
+                      child: Image.asset(
+                        'assets/images/app_icon.png',
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
 
                   const SizedBox(height: 32),
 
-                  // 标题
-                  const Text(
-                    'AirWord',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F2937), // gray-800
+                  // 标题 - 渐变色
+                  ShaderMask(
+                    shaderCallback: (bounds) => const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        primaryPurple,
+                        primaryIndigo,
+                        greenAccent,
+                      ],
+                      stops: [0.0, 0.5, 1.0],
+                    ).createShader(bounds),
+                    child: const Text(
+                      'AirWord',
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
 
