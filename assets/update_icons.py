@@ -326,8 +326,8 @@ def generate_desktop_icons(source_image: Path):
     # 生成 .ico (Windows)
     try:
         with Image.open(source_image) as img:
-            # ICO 文件需要多尺寸
-            sizes_ico = [(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
+            # ICO 文件需要多尺寸，256x256 放在第一位作为主显示尺寸
+            sizes_ico = [(256, 256), (128, 128), (64, 64), (48, 48), (32, 32), (16, 16)]
             imgs = []
             for size in sizes_ico:
                 resized = img.resize(size, Image.Resampling.LANCZOS)
@@ -335,13 +335,14 @@ def generate_desktop_icons(source_image: Path):
                     resized = resized.convert('RGBA')
                 imgs.append(resized)
 
+            # 保存 ICO，256x256 作为主图像
             imgs[0].save(
                 config["base_path"] / "icon.ico",
                 format='ICO',
                 sizes=sizes_ico,
                 append_images=imgs[1:]
             )
-            print("  ✓ icon.ico (Windows)")
+            print("  ✓ icon.ico (Windows, 256x256 主尺寸)")
     except Exception as e:
         print(f"  ⚠ icon.ico 生成失败: {e}")
 
